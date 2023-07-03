@@ -1,4 +1,6 @@
 async function init() {
+  console.log(`${socket.id} is here 1`);
+
   const path = window.location.pathname;
   const hostUser = path.split("/")[2];
   const data = await axios.get(`http://localhost:3000/get-user-id`);
@@ -6,14 +8,15 @@ async function init() {
   const messages = await axios.get(
     `http://localhost:3000/get-messages?hostUser=${hostUser}&username=${data.data.username}&status=pv`
   );
-  console.log(messages);
+
   await getMessages(messages.data);
+
+  console.log(`${socket.id} is here 1`);
 
   // Connect to Socket.IO server
   const socket = io(
     `/pv-chat?hostUser=${hostUser}&username=${data.data.username}`
   );
-
 
   const inputBoxForm = document.getElementById("inputBoxForm");
   const submitButton = document.getElementById("submitButton");
@@ -21,6 +24,7 @@ async function init() {
 
   inputBoxForm.addEventListener("submit", (e) => {
     e.preventDefault();
+    // console.log(`${socket.id} is here 8`);
     sendMessage();
   });
   submitButton.addEventListener("click", (e) => {
@@ -28,30 +32,38 @@ async function init() {
     sendMessage();
   });
 
-  socket.on("online", (users) => {
-    onlineUsers.innerHTML = "";
+  socket.on("check", () => {
+    console.log(`${socket.id} is here 2`);
 
-    for (const socketId in users) {
-      if (users[socketId] !== data.data.username)
-        onlineUsers.innerHTML += `
-              <li><span></span><a href="/pv-chat/${users[socketId]}" target="_blank">${users[socketId]}</a></li>
-            `;
+    for (let i = 0; i < 100; i++) {
+      if (i === 50) {
+        console.log("parsedData");
+      }
+      if (localStorage.getItem(`${i}`)) {
+        const storedData = localStorage.getItem(`${i}`);
+        const parsedData = JSON.parse(storedData);
+
+        if (socket.connected) {
+          socket.emit("chat message", parsedData);
+          localStorage.removeItem(`${i}`);
+          console.log(`${socket.id} is here 6`);
+
+        }
+      }
     }
   });
-  
 
   // Function to send a new message
   function sendMessage() {
     const messageInput = document.getElementById("messageInput");
     const message = messageInput.value.trim();
     const username = data.data.username;
-    const userId = data.data.id; 
+    const userId = data.data.id;
 
     // Get the current timestamp
-    const timestamp = new Date(); 
+    const timestamp = new Date();
 
     if (message !== "") {
-
       // Create an object with the message, username, and timestamp
       const messageData = {
         message,
@@ -59,14 +71,25 @@ async function init() {
         userId,
         timestamp,
       };
-      console.log("socket.connected: ",socket.connected);
+
+      console.log(`${socket.id} is here 3`);
 
       // Emit the 'newMessage' event to the server with the message data
-      if (data.data.id) {
+      if (socket.connected) {
         socket.emit("chat message", messageData);
+        console.log(`${socket.id} is here 4`);
 
         // Clear the input field
-        messageInput.value = ""; 
+        messageInput.value = "";
+      } else {
+        for (let i = 0; i < 100; i++) {
+          console.log(`${socket.id} is here 5`);
+
+          if (!localStorage.getItem(`${i}`)) {
+            localStorage.setItem(`${i}`, JSON.stringify(messageData));
+            break;
+          }
+        }
       }
     }
   }
@@ -91,6 +114,8 @@ async function init() {
 
   // Listen for 'newMessage' event from the server
   socket.on("chat message", (messageData) => {
+    console.log(`${socket.id} is here 7`);
+
     receiveMessage(messageData);
   });
 

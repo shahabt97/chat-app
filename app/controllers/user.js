@@ -79,16 +79,15 @@ module.exports.loginHandler = passport.authenticate("local", {
 });
 
 module.exports.logOutHandler = (req, res) => {
-  // console.log("1", req.session);
+  console.log("1", req.session);
 
   req.logOut((err) => {
-    // console.log("hiiii");
     if (err) {
       console.log(err);
     }
   });
   //   req.session.destroy();
-  // console.log("2", req.session);
+  console.log("2", req.session);
   res.redirect("/");
   //   req.session.destroy((err)=>{
   //     console.log(err);

@@ -43,21 +43,59 @@ function socketInitial(app) {
   });
 
   const socketData = {};
+  const remainedMessages = {};
 
   io.of("/pv-chat").on("connection", async (socket) => {
     const hostUser = socket.handshake.query.hostUser;
     const username = socket.handshake.query.username;
-    console.log(`${username} connected`);
+    // console.log(`${username} connected`);
+    if (username === "shahab") {
+      console.log(`${socket.id} is here 0`);
+    }
+
+    // console.log(socket.connected);
 
     socket.on("disconnect", () => {
       delete socketData[socket.id];
-      console.log(`${username} disconnected`);
+      // console.log(`${username} disconnected`);
+      if(username==="shahab"){
+        console.log(`${socket.id} is here 11`);
+      }
     });
+
+    if (remainedMessages[username]) {
+      if (remainedMessages[username].hostId) {
+        if (username === "shahab") {
+          console.log(`${socket.id} is here 8`);
+        }
+        io.of("/pv-chat")
+          .to([socket.id, remainedMessages.hostId])
+          .emit("chat message", data);
+        delete remainedMessages[username];
+        if(username==="shahab"){
+          console.log(`${socket.id} is here 10`);
+        }
+      } else {
+        io.of("/pv-chat").to(socket.id).emit("chat message", data);
+        if(username==="shahab"){
+          console.log("we are here 9")
+        }
+      }
+    }
+
+    // check if there is message in client-side
+    socket.emit("check");
+    if (username === "shahab") {
+      console.log(`${socket.id} is here 1`);
+    }
 
     socketData[socket.id] = { user: username, host: hostUser };
     // const user = await UserModel.findOne({ username: hostUser });
 
     socket.on("chat message", async (data) => {
+      if (username === "shahab") {
+        console.log(`${socket.id} is here 2`);
+      }
       axios
         .post(
           "http://localhost:3000/save-pv-messages",
@@ -74,31 +112,54 @@ function socketInitial(app) {
         )
         .then((data) => {
           if (data.data.isSaved) {
-            console.log("message saved successfully");
+            // console.log("message saved successfully");
           }
         })
         .catch((err) => {
-          console.log("message saving failed.");
+          // console.log("message saving failed.");
           console.log(err);
         });
       const soc = io.of("/pv-chat").sockets;
 
       for (const socketId of soc.keys()) {
-
-        console.log('user: ');
-        console.log(socketData[socketId]);
+        // console.log("user: ");
+        // console.log(socketData[socketId]);
 
         if (
           socketData[socketId].user === hostUser &&
           socketData[socketId].host === username
         ) {
-          return io
-            .of("/pv-chat")
-            .to([socket.id, socketId])
-            .emit("chat message", data);
+          if (username === "shahab") {
+            console.log(`${socket.id} is here 3`);
+          }
+          if (socket.connected) {
+            if (username === "shahab") {
+              console.log(`${socket.id} is here 4`);
+            }
+
+            return io
+              .of("/pv-chat")
+              .to([socket.id, socketId])
+              .emit("chat message", data);
+          } else {
+            remainedMessages[username] = { data, hostId: socketId };
+            if(username==="shahab"){
+              console.log(`${socket.id} is here 5`);
+            }
+          }
         }
       }
-      io.of("/pv-chat").to(socket.id).emit("chat message", data);
+      if (socket.connected) {
+        io.of("/pv-chat").to(socket.id).emit("chat message", data);
+        if(username==="shahab"){
+          console.log(`${socket.id} is here 6`);
+        }
+      } else {
+        remainedMessages[username] = { data, hostId: null };
+        if(username==="shahab"){
+          console.log(`${socket.id} is here 7`);
+        }
+      }
     });
 
     // console.log("this is it")
