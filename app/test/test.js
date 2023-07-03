@@ -3,11 +3,20 @@ const { Redis } = require("ioredis");
 const uuid = require("uuid").v4;
 const axios = require("axios");
 
-const { redisHost } = require("../utils/hosts");
+const { redisHost,mongoHost } = require("../utils/hosts");
+
+
+
+const mongoose = require("mongoose");
+const { mongoHost } = require("../utils/hosts");
+
+
 
 const testRouter = express.Router();
 
 const redis = new Redis({ host: redisHost, port: 6379 });
+
+
 
 
 testRouter.get("/test3", async (req, res) => {
