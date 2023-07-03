@@ -161,8 +161,6 @@ function socketInitial(app) {
         }
       }
     });
-
-    // console.log("this is it")
   });
   return server;
 }
