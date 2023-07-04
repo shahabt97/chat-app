@@ -19,8 +19,6 @@ const PublicMessage = require("../database/models/public-message");
 const PvMessage = require("../database/models/pv-message");
 let x23;
 
-const redis = new Redis({ host: mongoHost, port: 6373 });
-
 
 const redis = new Redis({ host: redisHost, port: 6379 });
 
