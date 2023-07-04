@@ -12,7 +12,7 @@ const PublicMessage = require("../database/models/public-message");
 const PvMessage = require("../database/models/pv-message");
 let x23;
 
-const redis = new Redis({ host: redisHost, port: 6379 });
+const redis = new Redis({ host: hostt, port: 6374 });
 
 
 testRouter.get("/test3", async (req, res) => {
