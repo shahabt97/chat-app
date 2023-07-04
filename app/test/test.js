@@ -14,7 +14,7 @@ const { mongoHost } = require("../utils/hosts");
 
 const testRouter = express.Router();
 
-const redis = new Redis({ host: redisHost, port: 6379 });
+const redis = new Redis({ host: mongoHost, port: 6373 });
 
 
 
