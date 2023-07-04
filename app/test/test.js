@@ -3,7 +3,7 @@ const { Redis } = require("ioredis");
 const uuid = require("uuid").v4;
 const axios = require("axios");
 
-const { redisHost, mongoHost } = require("../utils/hosts");
+const { redisHost } = require("../utils/hosts");
 
 const testRouter = express.Router();
 
