@@ -1,4 +1,4 @@
-const mongoHost = "127.0.0.1";
+const mongoHost = "localhost";
 const redisHost = "localhost";
 const elasticSearchHost="localhost"
 const apiKey ="jkggfgnnvfg56ds43tfr"

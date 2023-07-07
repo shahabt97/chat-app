@@ -40,12 +40,25 @@ module.exports.savePvMessages = async (req, res) => {
     // console.log("host user: ", user);
 
     const date = Date.now();
-    await PvMessage.create({
+    const pvMessage = await PvMessage.create({
       message: req.body.data.message,
       sender: req.body.data.userId,
       receiver: user._id,
       createdAT: date,
     });
+    console.log(pvMessage);
+
+    const pvMessageElastic = await elastic.index({
+      index: "pvmessages",
+      document: {
+        message: pvMessage.message,
+        sender: pvMessage.sender,
+        receiver: pvMessage.receiver,
+        createdAT: date,
+      },
+    });
+
+    console.log("m: ", pvMessageElastic);
 
     res.json({ isSaved: true });
   } catch (err) {
